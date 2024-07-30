@@ -157,4 +157,5 @@ func (g *Game) CollideWithPaddle() {
 			g.highScore = g.score
 		}
 	}
+	
 }
