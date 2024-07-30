@@ -43,26 +43,26 @@ type Game struct {
 func main() {
 	ebiten.SetWindowTitle("Pong in Ebitengine")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
+
 	paddle := Paddle{
 		Object: Object{
 			X: 600,
 			Y: 200,
 			W: 15,
 			H: 100,
-			},
+		},
 	}
+
 	ball := Ball{
 		Object: Object{
 			X: screenWidth / 2,
 			Y: screenHeight / 2,
 			W: 15,
 			H: 15,
-			},
-		dxdt: ballSpeed,
-		dydt: ballSpeed,
+		},
 	}
 	rand.Seed(time.Now().UnixNano())
-	ball.dxdt = (rand.Intn(2)*2 - 1) * ballSpeed // randomize initial direction
+	ball.dxdt = (rand.Intn(2)*2 - 1) * ballSpeed // Randomize initial direction
 	ball.dydt = (rand.Intn(2)*2 - 1) * ballSpeed
 
 	g := &Game{
@@ -81,30 +81,33 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	// Draw the paddle
 	vector.DrawFilledRect(screen, 
 		float32(g.paddle.X), float32(g.paddle.Y), 
 		float32(g.paddle.W), float32(g.paddle.H), 
 		color.White, false,
 	)
-	vector.DrawFilledRect(screen, 
-		float32(g.ball.X), float32(g.ball.Y), 
-		float32(g.ball.W), float32(g.ball.H), 
-		color.White, false,
-	)
 
+	// Draw the ball as a circle
+	radius := float32(g.ball.W) / 2
+	centerX := float32(g.ball.X) + radius
+	centerY := float32(g.ball.Y) + radius
+	vector.DrawFilledCircle(screen, centerX, centerY, radius, color.White, false)
+
+	// Draw the score
 	scoreStr := "Score: " + fmt.Sprint(g.score)
 	text.Draw(screen, scoreStr, basicfont.Face7x13, 10, 10, color.White)
 
+	// Draw the high score
 	highScoreStr := "High Score: " + fmt.Sprint(g.highScore)
 	text.Draw(screen, highScoreStr, basicfont.Face7x13, 10, 30, color.White)
-
 }
 
 func (g *Game) Update() error {	
-	g.paddle.MoveOnKeyPress()
-	g.ball.Move()
-	g.CollideWithWall()
-	g.CollideWithPaddle()
+	g.paddle.MoveOnKeyPress() // Move the paddle based on user input
+	g.ball.Move()             // Move the ball
+	g.CollideWithWall()       // Check ball collisions with walls
+	g.CollideWithPaddle()     // Check ball collisions with the paddle
 	return nil
 }
 
@@ -127,22 +130,21 @@ func (g *Game) Reset() {
 	g.ball.Y = screenHeight / 2
 
 	rand.Seed(time.Now().UnixNano())
-	g.ball.dxdt = (rand.Intn(2)*2 - 1) * ballSpeed // randomize reset direction
+	g.ball.dxdt = (rand.Intn(2)*2 - 1) * ballSpeed // Randomize reset direction
 	g.ball.dydt = (rand.Intn(2)*2 - 1) * ballSpeed
 
 	g.score = 0
 }
 
 func (g *Game) CollideWithWall() {
-
 	// Right wall causes a game over
 	if g.ball.X >= screenWidth {
 		g.Reset()
-	}else if g.ball.X <= 0{
+	} else if g.ball.X <= 0 {
 		g.ball.dxdt = ballSpeed
-	}else if g.ball.Y <= 0 {
+	} else if g.ball.Y <= 0 {
 		g.ball.dydt = ballSpeed
-	}else if g.ball.Y >= screenHeight {
+	} else if g.ball.Y >= screenHeight {
 		g.ball.dydt = -ballSpeed
 	}
 }
