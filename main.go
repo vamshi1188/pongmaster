@@ -1,13 +1,15 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"image/color"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"golang.org/x/image/font/basicfont"
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -15,8 +17,9 @@ import (
 const (
 	screenWidth  = 640
 	screenHeight = 480
-	ballSpeed = 3
-	paddleSpeed = 6
+	ballSpeed     = 4
+	paddleSpeed   = 6
+	highScoreFile = "highscore.txt"
 )
 
 type Object struct {
@@ -34,10 +37,10 @@ type Ball struct {
 }
 
 type Game struct {
-	paddle Paddle
-	ball Ball
-	score int
-	highScore int
+	paddle     Paddle
+	ball       Ball
+	score      int
+	highScore  int
 }
 
 func main() {
@@ -66,8 +69,9 @@ func main() {
 	ball.dydt = (rand.Intn(2)*2 - 1) * ballSpeed
 
 	g := &Game{
-		paddle: paddle,
-		ball: ball,
+		paddle:    paddle,
+		ball:      ball,
+		highScore: loadHighScore(),
 	}
 
 	err := ebiten.RunGame(g)
@@ -94,11 +98,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	centerY := float32(g.ball.Y) + radius
 	vector.DrawFilledCircle(screen, centerX, centerY, radius, color.White, false)
 
-	// Draw the score
+	// Draw the score and high score
 	scoreStr := "Score: " + fmt.Sprint(g.score)
 	text.Draw(screen, scoreStr, basicfont.Face7x13, 10, 10, color.White)
 
-	// Draw the high score
 	highScoreStr := "High Score: " + fmt.Sprint(g.highScore)
 	text.Draw(screen, highScoreStr, basicfont.Face7x13, 10, 30, color.White)
 }
@@ -133,11 +136,17 @@ func (g *Game) Reset() {
 	g.ball.dxdt = (rand.Intn(2)*2 - 1) * ballSpeed // Randomize reset direction
 	g.ball.dydt = (rand.Intn(2)*2 - 1) * ballSpeed
 
+	if g.score > g.highScore {
+		g.highScore = g.score
+		if err := saveHighScore(g.highScore); err != nil {
+			log.Printf("Failed to save high score: %v", err)
+		}
+	}
+
 	g.score = 0
 }
 
 func (g *Game) CollideWithWall() {
-	// Right wall causes a game over
 	if g.ball.X >= screenWidth {
 		g.Reset()
 	} else if g.ball.X <= 0 {
@@ -157,5 +166,27 @@ func (g *Game) CollideWithPaddle() {
 			g.highScore = g.score
 		}
 	}
-	
+}
+
+// Save the high score to a file
+func saveHighScore(score int) error {
+	err := ioutil.WriteFile(highScoreFile, []byte(fmt.Sprint(score)), 0644)
+	if err != nil {
+		return fmt.Errorf("failed to save high score: %w", err)
+	}
+	return nil
+}
+
+// Load the high score from a file
+func loadHighScore() int {
+	data, err := ioutil.ReadFile(highScoreFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return 0 // No high score file found, return 0
+		}
+		log.Fatalf("Failed to load high score: %v", err)
+	}
+	var highScore int
+	fmt.Sscanf(string(data), "%d", &highScore)
+	return highScore
 }
