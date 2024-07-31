@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
-	"os"
+	
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"image/color"
@@ -71,7 +70,7 @@ func main() {
 	g := &Game{
 		paddle:    paddle,
 		ball:      ball,
-		highScore: loadHighScore(),
+		
 	}
 
 	err := ebiten.RunGame(g)
@@ -138,9 +137,8 @@ func (g *Game) Reset() {
 
 	if g.score > g.highScore {
 		g.highScore = g.score
-		if err := saveHighScore(g.highScore); err != nil {
-			log.Printf("Failed to save high score: %v", err)
-		}
+		
+		
 	}
 
 	g.score = 0
@@ -166,27 +164,4 @@ func (g *Game) CollideWithPaddle() {
 			g.highScore = g.score
 		}
 	}
-}
-
-// Save the high score to a file
-func saveHighScore(score int) error {
-	err := ioutil.WriteFile(highScoreFile, []byte(fmt.Sprint(score)), 0644)
-	if err != nil {
-		return fmt.Errorf("failed to save high score: %w", err)
-	}
-	return nil
-}
-
-// Load the high score from a file
-func loadHighScore() int {
-	data, err := ioutil.ReadFile(highScoreFile)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return 0 // No high score file found, return 0
-		}
-		log.Fatalf("Failed to load high score: %v", err)
-	}
-	var highScore int
-	fmt.Sscanf(string(data), "%d", &highScore)
-	return highScore
 }
