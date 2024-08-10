@@ -10,25 +10,6 @@ import (
 	"time"
 )
 
-const (
-	// Define screen dimensions and other constants
-	screenWidth  = 640
-	screenHeight = 480
-	ballSpeed    = 4
-	paddleSpeed  = 6
-	highScoreFile = "highscore.txt" // File to save high score (not yet used)
-)
-
-// Object defines a general object with position and size
-type Object struct {
-	X, Y, W, H int
-}
-
-// Paddle represents the player's paddle, using the Object struct
-// type Paddle struct {
-// 	Object
-// }
-
 
 
 func main() {
@@ -49,7 +30,7 @@ func main() {
 	// Initialize the ball in the center of the screen
 	ball := Ball{
 		Object: Object{
-			X: screenWidth / 2, // Center of the screen
+			X: screenWidth /2, // Center of the screen
 			Y: screenHeight / 2, // Center of the screen
 			W: 15, // Width of the ball
 			H: 15, // Height of the ball (ball is a square but drawn as a circle)
@@ -81,25 +62,6 @@ func main() {
 
 
 
-// Reset resets the ball's position and velocity, and updates the high score if needed
-func (g *Game) Reset() {
-	g.ball.X = screenWidth / 2
-	g.ball.Y = screenHeight / 2
-
-	// Randomize the direction of the ball after reset
-	rand.Seed(time.Now().UnixNano())
-	g.ball.dxdt = (rand.Intn(2)*2 - 1) * ballSpeed
-	g.ball.dydt = (rand.Intn(2)*2 - 1) * ballSpeed
-
-	// Update high score if the current score is higher
-	if g.score > g.highScore {
-		g.highScore = g.score
-		// Save high score to a file (function not implemented yet)
-		// saveHighScore(g.highScore)
-	}
-
-	g.score = 0 // Reset score to zero
-}
 
 
 
