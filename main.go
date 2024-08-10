@@ -1,14 +1,11 @@
 package main
 
 import (
-	"fmt"
+	
 	"log"
 	
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
-	"image/color"
-	"github.com/hajimehoshi/ebiten/v2/text"
-	"golang.org/x/image/font/basicfont"
+	
 	"math/rand"
 	"time"
 )
@@ -32,12 +29,6 @@ type Object struct {
 // 	Object
 // }
 
-// Ball represents the ball, using the Object struct and adding velocity fields
-type Ball struct {
-	Object
-	dxdt int // x velocity per tick
-	dydt int // y velocity per tick
-}
 
 
 func main() {
@@ -84,37 +75,11 @@ func main() {
 
 
 
-// Draw renders the game objects on the screen
-func (g *Game) Draw(screen *ebiten.Image) {
-	// Draw the paddle
-	vector.DrawFilledRect(screen, 
-		float32(g.paddle.X), float32(g.paddle.Y), 
-		float32(g.paddle.W), float32(g.paddle.H), 
-		color.White, false,
-	)
-
-	// Draw the ball as a circle
-	radius := float32(g.ball.W) / 2
-	centerX := float32(g.ball.X) + radius
-	centerY := float32(g.ball.Y) + radius
-	vector.DrawFilledCircle(screen, centerX, centerY, radius, color.White, false)
-
-	// Draw the score
-	scoreStr := "Score: " + fmt.Sprint(g.score)
-	text.Draw(screen, scoreStr, basicfont.Face7x13, 10, 10, color.White)
-
-	// Draw the high score
-	highScoreStr := "High Score: " + fmt.Sprint(g.highScore)
-	text.Draw(screen, highScoreStr, basicfont.Face7x13, 10, 30, color.White)
-}
 
 
 
-// Move updates the ball's position based on its velocity
-func (b *Ball) Move() {
-	b.X += b.dxdt
-	b.Y += b.dydt
-}
+
+
 
 // Reset resets the ball's position and velocity, and updates the high score if needed
 func (g *Game) Reset() {
@@ -136,27 +101,5 @@ func (g *Game) Reset() {
 	g.score = 0 // Reset score to zero
 }
 
-// CollideWithWall handles ball collisions with the screen boundaries
-func (g *Game) CollideWithWall() {
-	if g.ball.X >= screenWidth { // Ball hits the right wall
-		g.Reset()
-	} else if g.ball.X <= 0 { // Ball hits the left wall
-		g.ball.dxdt = ballSpeed
-	} else if g.ball.Y <= 0 { // Ball hits the top wall
-		g.ball.dydt = ballSpeed
-	} else if g.ball.Y >= screenHeight { // Ball hits the bottom wall
-		g.ball.dydt = -ballSpeed
-	}
-}
 
-// CollideWithPaddle handles ball collisions with the paddle
-func (g *Game) CollideWithPaddle() {
-	// Check if the ball is within the paddle's bounds
-	if g.ball.X >= g.paddle.X && g.ball.Y >= g.paddle.Y && g.ball.Y <= g.paddle.Y + g.paddle.H {
-		g.ball.dxdt = -g.ball.dxdt // Reverse ball's horizontal direction
-		g.score++ // Increase score
-		if g.score > g.highScore { // Update high score if necessary
-			g.highScore = g.score
-		}
-	}
-}
+
