@@ -20,7 +20,7 @@ func main() {
 	// Initialize the paddle
 	paddle := Paddle{
 		Object: Object{
-			X: 600, // Paddle starts near the right edge
+			X: 700, // Paddle starts near the right edge
 			Y: 200, // Initial vertical position
 			W: 15,  // Width of the paddle
 			H: 100, // Height of the paddle

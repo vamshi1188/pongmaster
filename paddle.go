@@ -14,4 +14,10 @@ func (p *Paddle) MoveOnKeyPress() {
 	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) && p.Y > 0 {
 		p.Y -= paddleSpeed
 	}
+	if ebiten.IsKeyPressed(ebiten.KeyU)&& p.Y > 0 {
+		p.Y -= paddleSpeed
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyI)&& p.Y + p.H < screenHeight {
+		p.Y += paddleSpeed
+	}
 }

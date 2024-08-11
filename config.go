@@ -3,7 +3,7 @@ package main
 
 const (
 	// Define screen dimensions and other constants
-	screenWidth  = 640
+	screenWidth  = 740
 	screenHeight = 480
 	ballSpeed    = 4
 	paddleSpeed  = 6
