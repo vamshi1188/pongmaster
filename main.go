@@ -13,6 +13,7 @@ import (
 
 
 func main() {
+	
 	// Set the window title and size
 	ebiten.SetWindowTitle("Pong in Ebitengine")
 	ebiten.SetWindowSize(screenWidth, screenHeight)
